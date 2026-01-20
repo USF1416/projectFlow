@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import LoginPage from "./pages/LoginPage.jsx";
-import DashboardPage from "./pages/DashboardPage.jsx";
-import ProjectsPage from "./pages/ProjectsPage.jsx";
-import BoardPage from "./pages/BoardPage.jsx";
+import LoginPage from "../pages/LoginPage.jsx";
+import DashboardPage from "../pages/DashboardPage.jsx";
+import ProjectsPage from "../pages/ProjectsPage.jsx";
+import BoardPage from "../pages/BoardPage.jsx";
 
 export default function AppRouter() {
   return (
