@@ -14,7 +14,7 @@ export default function AppRouter({ data }) {
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage data={data} />} />
         <Route path="/projects" element={<ProjectsPage data={data} />} />
-        <Route path="/board" element={<BoardPage data={data} />} />
+        <Route path="/board/:projectId" element={<BoardPage data={data} />} />
       </Route>
 
       <Route path="*" element={<Navigate to="/login" replace />} />

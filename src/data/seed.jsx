@@ -11,6 +11,8 @@ export const projects = [
     code: "ANA",
     description:
       "Real-time business intelligence dashboard with data visualization and reporting features.",
+    progress: 78,
+    team: ["u1", "u2"],
   },
   {
     id: "p2",
@@ -18,6 +20,8 @@ export const projects = [
     code: "API",
     description:
       "Building RESTful APIs and microservices architecture for backend infrastructure.",
+    progress: 45,
+    team: ["u1", "u3"],
   },
   {
     id: "p3",
@@ -25,6 +29,8 @@ export const projects = [
     code: "CUS",
     description:
       "Self-service portal for customers to manage accounts, view orders, and access support.",
+    progress: 92,
+    team: ["u2", "u3"],
   },
 ];
 
@@ -40,7 +46,7 @@ export const issues = [
   },
   {
     id: "PF-126",
-    projectId: "p1",
+    projectId: "p3",
     title: "Design dashboard analytics widgets",
     status: "todo",
     priority: "medium",
@@ -60,14 +66,14 @@ export const issues = [
     id: "PF-124",
     projectId: "p1",
     title: "Update API documentation",
-    status: "in_progress",
+    status: "done",
     priority: "low",
     assigneeId: "u2",
     description: "Improve README and endpoint descriptions.",
   },
   {
     id: "PF-123",
-    projectId: "p2",
+    projectId: "p3",
     title: "Optimize database queries",
     status: "todo",
     priority: "medium",
@@ -75,3 +81,19 @@ export const issues = [
     description: "Review query performance and add indexes.",
   },
 ];
+
+export function getProjectProgress(projectId, issues) {
+  // On récupère uniquement les issues liées au projet donné
+  const projectIssues = issues.filter((issue) => issue.projectId === projectId);
+  // Si pas d'issue, la progression est de 0 %
+  if (projectIssues.length === 0) {
+    return 0;
+  }
+  // le nombre d'issues terminées ("done")
+  const doneIssuesCount = projectIssues.filter(
+    (issue) => issue.status === "done",
+  ).length;
+  // Math.round permet d'obtenir un nombre entier propre
+  const progress = Math.round((doneIssuesCount / projectIssues.length) * 100);
+  return progress;
+}
