@@ -1,3 +1,4 @@
+// Composant réutilisable pour états vides
 import Card from "./Card";
 
 export default function EmptyState({

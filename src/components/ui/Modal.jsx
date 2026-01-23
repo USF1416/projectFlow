@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 
 export default function Modal({ title, children, footer, onClose }) {
+
+  // Fermeture avec la touche Escape
   useEffect(() => {
     const onKey = (e) => {
       if (e.key === "Escape") onClose?.();
@@ -9,16 +11,26 @@ export default function Modal({ title, children, footer, onClose }) {
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose]);
 
+  // Fermeture si clic sur l’arrière-plan
   const onBackdrop = (e) => {
-    if (e.target.classList.contains("modal-backdrop")) onClose?.();
+    if (e.target.classList.contains("modal-backdrop")) {
+      onClose?.();
+    }
   };
 
   return (
     <div className="modal-backdrop" onMouseDown={onBackdrop}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title || "Modal"}>
+      <div
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={title || "Modal"}
+      >
         <div className="modal__header">
           <strong>{title}</strong>
-          <button className="iconbtn" onClick={onClose} aria-label="Close">✕</button>
+          <button className="iconbtn" onClick={onClose} aria-label="Close">
+            ✕
+          </button>
         </div>
 
         <div className="modal__body">{children}</div>

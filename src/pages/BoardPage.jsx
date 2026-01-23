@@ -6,9 +6,11 @@ import IssueModal from "../components/IssueModal";
 import Select from "../components/ui/Select";
 
 export default function BoardPage({ data }) {
-  const { projectId } = useParams(); // peut être undefined sur /board
+  // Récupère le projectId depuis l’URL (/board ou /board/:projectId)
+  const { projectId } = useParams();
   const navigate = useNavigate();
 
+  // Données globales fournies par App.jsx
   const {
     projects,
     issues,
@@ -20,26 +22,29 @@ export default function BoardPage({ data }) {
     updateIssue,
   } = data;
 
-  // filtre local : par défaut "all"
+  // État local : filtre projet (all ou id d’un projet)
   const [selectedProjectId, setSelectedProjectId] = useState(
-    projectId || "all",
+    projectId || "all"
   );
 
-  // si l’URL change (ex: /board/p2), on sync le select
+  // Synchronise le select avec l’URL si l’utilisateur navigue
   useEffect(() => {
     setSelectedProjectId(projectId || "all");
   }, [projectId]);
 
+  // Projet sélectionné (ou null si "all")
   const selectedProject = useMemo(() => {
     if (selectedProjectId === "all") return null;
     return projects.find((p) => p.id === selectedProjectId) || null;
   }, [projects, selectedProjectId]);
 
+  // Issues visibles selon le filtre
   const visibleIssues = useMemo(() => {
     if (selectedProjectId === "all") return issues;
     return issues.filter((i) => i.projectId === selectedProjectId);
   }, [issues, selectedProjectId]);
 
+  // Regroupement des issues par statut (Kanban)
   const byStatus = useMemo(() => {
     return {
       todo: visibleIssues.filter((i) => i.status === "todo"),
@@ -48,29 +53,31 @@ export default function BoardPage({ data }) {
     };
   }, [visibleIssues]);
 
+  // Helpers pour retrouver un user ou un projet
   const userById = (id) => users.find((u) => u.id === id);
   const projectById = (id) => projects.find((p) => p.id === id);
 
+  // Gestion du changement de filtre
+  // → met à jour l’URL pour garder une navigation cohérente
   const onFilterChange = (value) => {
     setSelectedProjectId(value);
-
-    // On garde l’URL cohérente (propre pour navigation)
     if (value === "all") navigate("/board");
     else navigate(`/board/${value}`);
   };
 
-  // si projects est vide (rare), on gère proprement
-  if (!projects || projects.length === 0) {
+  // Sécurité : aucun projet existant
+  if (!projects.length) {
     return (
       <EmptyState
         title="No projects"
-        description="Create a project first to start managing issues."
+        description="Create a project first to manage issues."
       />
     );
   }
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
+      {/* En-tête du board */}
       <div className="board-header">
         <div>
           <h1 style={{ fontSize: 24 }}>
@@ -83,6 +90,7 @@ export default function BoardPage({ data }) {
           </p>
         </div>
 
+        {/* Filtre projet */}
         <div style={{ width: 260 }}>
           <Select
             label="Filter by project"
@@ -99,6 +107,7 @@ export default function BoardPage({ data }) {
         </div>
       </div>
 
+      {/* Colonnes Kanban */}
       <div className="board-grid">
         <Column title="To Do" items={byStatus.todo}>
           {byStatus.todo.length ? (
@@ -113,10 +122,7 @@ export default function BoardPage({ data }) {
               />
             ))
           ) : (
-            <EmptyState
-              title="No issues"
-              description="No issues in this column yet."
-            />
+            <EmptyState title="No issues" description="Nothing to do here." />
           )}
         </Column>
 
@@ -133,10 +139,7 @@ export default function BoardPage({ data }) {
               />
             ))
           ) : (
-            <EmptyState
-              title="No issues"
-              description="No issues in this column yet."
-            />
+            <EmptyState title="No issues" description="Nothing in progress." />
           )}
         </Column>
 
@@ -153,14 +156,12 @@ export default function BoardPage({ data }) {
               />
             ))
           ) : (
-            <EmptyState
-              title="No issues"
-              description="No issues in this column yet."
-            />
+            <EmptyState title="No issues" description="Nothing completed yet." />
           )}
         </Column>
       </div>
 
+      {/* Modal d’édition d’issue */}
       {modalIssueId && modalIssue ? (
         <IssueModal
           issue={modalIssue}
@@ -175,6 +176,8 @@ export default function BoardPage({ data }) {
     </div>
   );
 }
+
+/* Composants internes */
 
 function Column({ title, items, children }) {
   return (
@@ -205,15 +208,12 @@ function IssueCard({ issue, assignee, project, showProject, onOpen }) {
       <p className="issue-title">{issue.title}</p>
 
       <div className="issue-footer">
-        <div style={{ display: "grid", gap: 4 }}>
+        <div>
           <span className="issue-small">{labelStatus(issue.status)}</span>
           {showProject && project ? (
-            <span
-              className="issue-small"
-              style={{ color: "var(--color-muted)" }}
-            >
+            <div className="issue-small" style={{ color: "var(--color-muted)" }}>
               {project.name}
-            </span>
+            </div>
           ) : null}
         </div>
 
@@ -224,6 +224,8 @@ function IssueCard({ issue, assignee, project, showProject, onOpen }) {
     </div>
   );
 }
+
+/* Helpers d’affichage */
 
 function labelStatus(s) {
   if (s === "in_progress") return "In Progress";

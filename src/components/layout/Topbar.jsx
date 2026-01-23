@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 export default function Topbar() {
   const location = useLocation();
 
+  // Titre déterminé par l’URL (simple et lisible)
   const title = (() => {
     if (location.pathname.startsWith("/dashboard")) return "Dashboard";
     if (location.pathname.startsWith("/projects")) return "Projects";
@@ -12,12 +13,15 @@ export default function Topbar() {
 
   return (
     <>
+      {/* Titre/Contexte */}
       <div>
         <div style={{ fontSize: 12, color: "var(--color-muted)" }}>ProjectFlow</div>
         <strong>{title}</strong>
       </div>
 
+      {/* Actions à droite */}
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        {/* Recherche V1 : visuelle uniquement */}
         <input
           placeholder="Search..."
           className="topbar-search"
@@ -29,6 +33,8 @@ export default function Topbar() {
             background: "var(--color-surface)",
           }}
         />
+
+        {/* Avatar mock */}
         <div
           style={{
             width: 34,

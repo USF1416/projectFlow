@@ -1,3 +1,4 @@
+// Carte générique : header / body / footer optionnels
 export default function Card({ title, right, children, footer }) {
   return (
     <section className="card">
@@ -8,8 +9,10 @@ export default function Card({ title, right, children, footer }) {
         </div>
       ) : null}
 
+      {/* Contenu principal */}
       <div className="card__body">{children}</div>
 
+      {/* Zone actions */}
       {footer ? <div className="card__footer">{footer}</div> : null}
     </section>
   );

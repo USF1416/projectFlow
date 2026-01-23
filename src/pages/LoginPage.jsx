@@ -7,31 +7,37 @@ import Card from "../components/ui/Card";
 export default function LoginPage() {
   const navigate = useNavigate();
 
+  // État du formulaire (demo)
   const [email, setEmail] = useState("john@projectflow.dev");
   const [password, setPassword] = useState("demo");
+
+  // UX: loading + message d'erreur
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  // Soumission du formulaire
+  // Ici : login simulé (pas de backend), l'objectif est de démontrer l'UX + navigation
   const submit = (e) => {
     e.preventDefault();
     setError("");
 
-    // Validation simple (portfolio)
+    // Validation minimale (portfolio)
     if (!email.trim() || !password.trim()) {
       setError("Email and password are required.");
       return;
     }
 
+    // Simulation d'appel serveur
     setLoading(true);
-
-    // Fake login (pas de backend)
     setTimeout(() => {
       setLoading(false);
+      // Après "auth", on redirige vers l'app
       navigate("/dashboard");
     }, 800);
   };
 
   return (
+    // Page centrée avec un fond léger (style SaaS)
     <div
       style={{
         minHeight: "100vh",
@@ -43,6 +49,7 @@ export default function LoginPage() {
       }}
     >
       <div style={{ width: "min(420px, 100%)" }}>
+        {/* Branding */}
         <div
           style={{
             display: "flex",
@@ -73,6 +80,7 @@ export default function LoginPage() {
           </div>
         </div>
 
+        {/* Carte principale */}
         <Card title="Login">
           <form onSubmit={submit} style={{ display: "grid", gap: 12 }}>
             <Input
@@ -90,6 +98,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
             />
 
+            {/* Erreur lisible, pas d'alert() */}
             {error ? (
               <div
                 style={{
@@ -102,6 +111,7 @@ export default function LoginPage() {
               </div>
             ) : null}
 
+            {/* Bouton avec état loading */}
             <Button disabled={loading}>
               {loading ? "Signing in..." : "Sign in"}
             </Button>

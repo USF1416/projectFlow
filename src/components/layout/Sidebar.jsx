@@ -1,6 +1,7 @@
 import { NavLink } from "react-router-dom";
 
 export default function Sidebar() {
+  // Petit composant interne : gère le style actif/inactif avec NavLink
   function SideLink({ to, label }) {
     return (
       <NavLink
@@ -20,14 +21,8 @@ export default function Sidebar() {
   }
 
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 18,
-        height: "100%",
-      }}
-    >
+    <div style={{ display: "flex", flexDirection: "column", gap: 18, height: "100%" }}>
+      {/* Logo + nom (branding) */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div
           style={{
@@ -47,15 +42,16 @@ export default function Sidebar() {
         <strong>ProjectFlow</strong>
       </div>
 
+      {/* Menu principal */}
       <nav style={{ display: "flex", flexDirection: "column", gap: 8 }}>
         <SideLink to="/dashboard" label="Dashboard" />
         <SideLink to="/projects" label="Projects" />
+        {/* /board = board global (toutes issues) */}
         <SideLink to="/board" label="Board" />
       </nav>
 
-      <div
-        style={{ marginTop: "auto", fontSize: 13, color: "var(--color-muted)" }}
-      >
+      {/* Footer */}
+      <div style={{ marginTop: "auto", fontSize: 13, color: "var(--color-muted)" }}>
         Version démo
       </div>
     </div>

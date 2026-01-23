@@ -3,17 +3,21 @@ import Badge from "../components/ui/Badge";
 import Button from "../components/ui/Button";
 
 export default function DashboardPage({ data }) {
+  // On récupère les issues depuis l'état global (App.jsx)
+  // → Dashboard n'a pas sa propre source de vérité
   const { issues } = data;
 
+  // Stats simples calculées à l'affichage (données dérivées)
   const total = issues.length;
   const inProgress = issues.filter((i) => i.status === "in_progress").length;
   const completed = issues.filter((i) => i.status === "done").length;
 
-  // Overdue: V1 fake, on prend une valeur statique ou on met 0
-  const overdue = 7; // comme sur le visuel, mais volontairement statique
+  // Overdue = valeur statique pour V1 (pas de logique de dates)
+  const overdue = 7;
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
+      {/* Titre + sous-titre */}
       <div>
         <h1 style={{ fontSize: 24 }}>Dashboard</h1>
         <p style={{ color: "var(--color-muted)", marginTop: 6 }}>
@@ -21,44 +25,24 @@ export default function DashboardPage({ data }) {
         </p>
       </div>
 
+      {/* Cartes de stats */}
       <div className="stats-grid">
-        <StatCard
-          title="Total Issues"
-          value={total}
-          hint="+12 from last week"
-        />
-        <StatCard
-          title="In Progress"
-          value={inProgress}
-          hint="+5 from last week"
-        />
-        <StatCard
-          title="Completed"
-          value={completed}
-          hint="+18 from last week"
-        />
-        <StatCard
-          title="Overdue"
-          value={overdue}
-          hint="-3 from last week"
-          danger
-        />
+        <StatCard title="Total Issues" value={total} hint="+12 from last week" />
+        <StatCard title="In Progress" value={inProgress} hint="+5 from last week" />
+        <StatCard title="Completed" value={completed} hint="+18 from last week" />
+        <StatCard title="Overdue" value={overdue} hint="-3 from last week" danger />
       </div>
 
+      {/* Liste d'issues récentes : prouve que l'UI est branchée sur les données */}
       <Card
         title="Recent Issues"
         right={
           <div style={{ display: "flex", gap: 10 }}>
-            <Button
-              variant="secondary"
-              onClick={() => alert("V1: modal plus tard")}
-            >
+            {/* Actions V1 : visuelles (pas de création complète ici) */}
+            <Button variant="secondary" onClick={() => {}}>
               New Issue
             </Button>
-            <Button
-              variant="secondary"
-              onClick={() => alert("V1: page plus tard")}
-            >
+            <Button variant="secondary" onClick={() => {}}>
               View all
             </Button>
           </div>
@@ -88,6 +72,7 @@ export default function DashboardPage({ data }) {
   );
 }
 
+// Composant local : carte de stats simple et réutilisable
 function StatCard({ title, value, hint, danger = false }) {
   return (
     <Card title={title}>
@@ -105,6 +90,7 @@ function StatCard({ title, value, hint, danger = false }) {
   );
 }
 
+// Helpers d'affichage : mapping statut/priority → libellés + couleurs
 function statusKind(s) {
   if (s === "done") return "success";
   if (s === "in_progress") return "warning";

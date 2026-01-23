@@ -5,6 +5,7 @@ import Input from "./ui/Input";
 import Select from "./ui/Select";
 
 export default function IssueModal({ issue, users, onClose, onSave }) {
+  // États locaux du formulaire (copie de l’issue)
   const [title, setTitle] = useState(issue.title);
   const [status, setStatus] = useState(issue.status);
   const [priority, setPriority] = useState(issue.priority);
@@ -12,14 +13,18 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
   const [description, setDescription] = useState(issue.description || "");
   const [error, setError] = useState("");
 
+  // Validation + sauvegarde
   const save = () => {
     setError("");
 
+    // Validation minimale (portfolio)
     if (!title.trim()) {
       setError("Title is required.");
       return;
     }
 
+    // On ne modifie PAS l’état ici
+    // → on remonte les changements au parent
     onSave({
       title: title.trim(),
       status,
@@ -42,6 +47,7 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
         </>
       }
     >
+      {/* Champ titre avec gestion d’erreur */}
       <Input
         label="Title"
         value={title}
@@ -49,34 +55,21 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
         error={error}
       />
 
-      <div
-        style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}
-      >
-        <Select
-          label="Status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-        >
+      {/* Champs regroupés */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12 }}>
+        <Select label="Status" value={status} onChange={(e) => setStatus(e.target.value)}>
           <option value="todo">To Do</option>
           <option value="in_progress">In Progress</option>
           <option value="done">Done</option>
         </Select>
 
-        <Select
-          label="Priority"
-          value={priority}
-          onChange={(e) => setPriority(e.target.value)}
-        >
+        <Select label="Priority" value={priority} onChange={(e) => setPriority(e.target.value)}>
           <option value="low">Low</option>
           <option value="medium">Medium</option>
           <option value="high">High</option>
         </Select>
 
-        <Select
-          label="Assignee"
-          value={assigneeId}
-          onChange={(e) => setAssigneeId(e.target.value)}
-        >
+        <Select label="Assignee" value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)}>
           {users.map((u) => (
             <option key={u.id} value={u.id}>
               {u.name}
@@ -85,6 +78,7 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
         </Select>
       </div>
 
+      {/* Description libre */}
       <div className="field">
         <label className="label">Description</label>
         <textarea
@@ -92,7 +86,6 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-        <div className="help">Keep it short and actionable.</div>
       </div>
     </Modal>
   );
