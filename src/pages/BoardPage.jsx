@@ -2,10 +2,21 @@ import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
+import IssueModal from "../components/IssueModal";
 
 export default function BoardPage({ data }) {
   const { projectId } = useParams();
-  const { projects, issues, users } = data;
+
+  const {
+    projects,
+    issues,
+    users,
+    modalIssueId,
+    modalIssue,
+    openIssue,
+    closeIssue,
+    updateIssue,
+  } = data;
 
   const project = projects.find((p) => p.id === projectId);
 
@@ -52,6 +63,7 @@ export default function BoardPage({ data }) {
                 key={it.id}
                 issue={it}
                 assignee={userById(it.assigneeId)}
+                onOpen={openIssue}
               />
             ))
           ) : (
@@ -66,6 +78,7 @@ export default function BoardPage({ data }) {
                 key={it.id}
                 issue={it}
                 assignee={userById(it.assigneeId)}
+                onOpen={openIssue}
               />
             ))
           ) : (
@@ -80,6 +93,7 @@ export default function BoardPage({ data }) {
                 key={it.id}
                 issue={it}
                 assignee={userById(it.assigneeId)}
+                onOpen={openIssue}
               />
             ))
           ) : (
@@ -87,6 +101,18 @@ export default function BoardPage({ data }) {
           )}
         </Column>
       </div>
+
+      {modalIssueId && modalIssue ? (
+        <IssueModal
+          issue={modalIssue}
+          users={users}
+          onClose={closeIssue}
+          onSave={(patch) => {
+            updateIssue(modalIssue.id, patch);
+            closeIssue();
+          }}
+        />
+      ) : null}
     </div>
   );
 }
@@ -103,9 +129,18 @@ function Column({ title, items, children }) {
   );
 }
 
-function IssueCard({ issue, assignee }) {
+function IssueCard({ issue, assignee, onOpen }) {
   return (
-    <div className="issue-card">
+    <div
+      className="issue-card"
+      onClick={() => onOpen(issue.id)}
+      style={{ cursor: "pointer" }}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onOpen(issue.id);
+      }}
+    >
       <div className="issue-top">
         <span className="issue-small">{issue.id}</span>
         <Badge kind={priorityKind(issue.priority)}>
