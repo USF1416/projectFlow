@@ -1,11 +1,14 @@
-import { useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useMemo, useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Badge from "../components/ui/Badge";
 import EmptyState from "../components/ui/EmptyState";
 import IssueModal from "../components/IssueModal";
+import Select from "../components/ui/Select";
 
 export default function BoardPage({ data }) {
-  const { projectId } = useParams();
+  const { projectId } = useParams(); // peut être undefined sur /board
+  const navigate = useNavigate();
+
   const {
     projects,
     issues,
@@ -17,27 +20,51 @@ export default function BoardPage({ data }) {
     updateIssue,
   } = data;
 
-  const project = projects.find((p) => p.id === projectId);
+  // filtre local : par défaut "all"
+  const [selectedProjectId, setSelectedProjectId] = useState(
+    projectId || "all",
+  );
 
-  const projectIssues = useMemo(() => {
-    return issues.filter((i) => i.projectId === projectId);
-  }, [issues, projectId]);
+  // si l’URL change (ex: /board/p2), on sync le select
+  useEffect(() => {
+    setSelectedProjectId(projectId || "all");
+  }, [projectId]);
+
+  const selectedProject = useMemo(() => {
+    if (selectedProjectId === "all") return null;
+    return projects.find((p) => p.id === selectedProjectId) || null;
+  }, [projects, selectedProjectId]);
+
+  const visibleIssues = useMemo(() => {
+    if (selectedProjectId === "all") return issues;
+    return issues.filter((i) => i.projectId === selectedProjectId);
+  }, [issues, selectedProjectId]);
 
   const byStatus = useMemo(() => {
     return {
-      todo: projectIssues.filter((i) => i.status === "todo"),
-      in_progress: projectIssues.filter((i) => i.status === "in_progress"),
-      done: projectIssues.filter((i) => i.status === "done"),
+      todo: visibleIssues.filter((i) => i.status === "todo"),
+      in_progress: visibleIssues.filter((i) => i.status === "in_progress"),
+      done: visibleIssues.filter((i) => i.status === "done"),
     };
-  }, [projectIssues]);
+  }, [visibleIssues]);
 
   const userById = (id) => users.find((u) => u.id === id);
+  const projectById = (id) => projects.find((p) => p.id === id);
 
-  if (!project) {
+  const onFilterChange = (value) => {
+    setSelectedProjectId(value);
+
+    // On garde l’URL cohérente (propre pour navigation)
+    if (value === "all") navigate("/board");
+    else navigate(`/board/${value}`);
+  };
+
+  // si projects est vide (rare), on gère proprement
+  if (!projects || projects.length === 0) {
     return (
       <EmptyState
-        title="Project not found"
-        description="The project you are trying to open does not exist."
+        title="No projects"
+        description="Create a project first to start managing issues."
       />
     );
   }
@@ -46,10 +73,29 @@ export default function BoardPage({ data }) {
     <div style={{ display: "grid", gap: 16 }}>
       <div className="board-header">
         <div>
-          <h1 style={{ fontSize: 24 }}>{project.name}</h1>
+          <h1 style={{ fontSize: 24 }}>
+            {selectedProject ? selectedProject.name : "Board"}
+          </h1>
           <p style={{ color: "var(--color-muted)", marginTop: 6 }}>
-            {project.description}
+            {selectedProject
+              ? selectedProject.description
+              : "All issues across all projects."}
           </p>
+        </div>
+
+        <div style={{ width: 260 }}>
+          <Select
+            label="Filter by project"
+            value={selectedProjectId}
+            onChange={(e) => onFilterChange(e.target.value)}
+          >
+            <option value="all">All projects</option>
+            {projects.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.name}
+              </option>
+            ))}
+          </Select>
         </div>
       </div>
 
@@ -61,6 +107,8 @@ export default function BoardPage({ data }) {
                 key={it.id}
                 issue={it}
                 assignee={userById(it.assigneeId)}
+                project={projectById(it.projectId)}
+                showProject={selectedProjectId === "all"}
                 onOpen={openIssue}
               />
             ))
@@ -79,6 +127,8 @@ export default function BoardPage({ data }) {
                 key={it.id}
                 issue={it}
                 assignee={userById(it.assigneeId)}
+                project={projectById(it.projectId)}
+                showProject={selectedProjectId === "all"}
                 onOpen={openIssue}
               />
             ))
@@ -97,6 +147,8 @@ export default function BoardPage({ data }) {
                 key={it.id}
                 issue={it}
                 assignee={userById(it.assigneeId)}
+                project={projectById(it.projectId)}
+                showProject={selectedProjectId === "all"}
                 onOpen={openIssue}
               />
             ))
@@ -136,7 +188,7 @@ function Column({ title, items, children }) {
   );
 }
 
-function IssueCard({ issue, assignee, onOpen }) {
+function IssueCard({ issue, assignee, project, showProject, onOpen }) {
   return (
     <div
       className="issue-card"
@@ -153,7 +205,18 @@ function IssueCard({ issue, assignee, onOpen }) {
       <p className="issue-title">{issue.title}</p>
 
       <div className="issue-footer">
-        <span className="issue-small">{labelStatus(issue.status)}</span>
+        <div style={{ display: "grid", gap: 4 }}>
+          <span className="issue-small">{labelStatus(issue.status)}</span>
+          {showProject && project ? (
+            <span
+              className="issue-small"
+              style={{ color: "var(--color-muted)" }}
+            >
+              {project.name}
+            </span>
+          ) : null}
+        </div>
+
         <div className="mini-avatar" title={assignee?.name}>
           {assignee?.initials || "?"}
         </div>

@@ -15,10 +15,7 @@ export default function AppRouter({ data }) {
         <Route path="/dashboard" element={<DashboardPage data={data} />} />
         <Route path="/projects" element={<ProjectsPage data={data} />} />
 
-        <Route
-          path="/board"
-          element={<Navigate to={`/board/${data.projects[0].id}`} replace />}
-        />
+        <Route path="/board" element={<BoardPage data={data} />} />
         <Route path="/board/:projectId" element={<BoardPage data={data} />} />
       </Route>
 
