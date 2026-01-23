@@ -1,12 +1,11 @@
 import { useMemo } from "react";
 import { useParams } from "react-router-dom";
-import Card from "../components/ui/Card";
 import Badge from "../components/ui/Badge";
+import EmptyState from "../components/ui/EmptyState";
 import IssueModal from "../components/IssueModal";
 
 export default function BoardPage({ data }) {
   const { projectId } = useParams();
-
   const {
     projects,
     issues,
@@ -36,11 +35,10 @@ export default function BoardPage({ data }) {
 
   if (!project) {
     return (
-      <Card title="Project not found">
-        <p style={{ color: "var(--color-muted)" }}>
-          Le projet demandé n’existe pas.
-        </p>
-      </Card>
+      <EmptyState
+        title="Project not found"
+        description="The project you are trying to open does not exist."
+      />
     );
   }
 
@@ -67,7 +65,10 @@ export default function BoardPage({ data }) {
               />
             ))
           ) : (
-            <EmptyColumn />
+            <EmptyState
+              title="No issues"
+              description="No issues in this column yet."
+            />
           )}
         </Column>
 
@@ -82,7 +83,10 @@ export default function BoardPage({ data }) {
               />
             ))
           ) : (
-            <EmptyColumn />
+            <EmptyState
+              title="No issues"
+              description="No issues in this column yet."
+            />
           )}
         </Column>
 
@@ -97,7 +101,10 @@ export default function BoardPage({ data }) {
               />
             ))
           ) : (
-            <EmptyColumn />
+            <EmptyState
+              title="No issues"
+              description="No issues in this column yet."
+            />
           )}
         </Column>
       </div>
@@ -135,11 +142,6 @@ function IssueCard({ issue, assignee, onOpen }) {
       className="issue-card"
       onClick={() => onOpen(issue.id)}
       style={{ cursor: "pointer" }}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === "Enter") onOpen(issue.id);
-      }}
     >
       <div className="issue-top">
         <span className="issue-small">{issue.id}</span>
@@ -157,14 +159,6 @@ function IssueCard({ issue, assignee, onOpen }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function EmptyColumn() {
-  return (
-    <Card>
-      <p style={{ color: "var(--color-muted)" }}>No issues in this column.</p>
-    </Card>
   );
 }
 

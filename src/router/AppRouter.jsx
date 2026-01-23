@@ -14,6 +14,11 @@ export default function AppRouter({ data }) {
       <Route element={<AppLayout />}>
         <Route path="/dashboard" element={<DashboardPage data={data} />} />
         <Route path="/projects" element={<ProjectsPage data={data} />} />
+
+        <Route
+          path="/board"
+          element={<Navigate to={`/board/${data.projects[0].id}`} replace />}
+        />
         <Route path="/board/:projectId" element={<BoardPage data={data} />} />
       </Route>
 

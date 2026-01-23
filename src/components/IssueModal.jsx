@@ -10,10 +10,16 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
   const [priority, setPriority] = useState(issue.priority);
   const [assigneeId, setAssigneeId] = useState(issue.assigneeId);
   const [description, setDescription] = useState(issue.description || "");
+  const [error, setError] = useState("");
 
   const save = () => {
-    // Validation simple (BTS-friendly)
-    if (!title.trim()) return alert("Title required");
+    setError("");
+
+    if (!title.trim()) {
+      setError("Title is required.");
+      return;
+    }
+
     onSave({
       title: title.trim(),
       status,
@@ -40,6 +46,7 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
         label="Title"
         value={title}
         onChange={(e) => setTitle(e.target.value)}
+        error={error}
       />
 
       <div
@@ -85,6 +92,7 @@ export default function IssueModal({ issue, users, onClose, onSave }) {
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
+        <div className="help">Keep it short and actionable.</div>
       </div>
     </Modal>
   );
